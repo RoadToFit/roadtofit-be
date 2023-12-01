@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
-class AccountController {
+class UserController {
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       res.status(200);
@@ -16,4 +16,4 @@ class AccountController {
   };
 }
 
-export default new AccountController();
+export default new UserController();

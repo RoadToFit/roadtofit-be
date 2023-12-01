@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import bodyParser from 'body-parser';
 import { config as dotenv } from 'dotenv';
 
-import AccountRouter from './routes/account';
+import UserRouter from './routes/user';
 
 class App {
   public app: Application;
@@ -19,7 +19,7 @@ class App {
   }
 
   protected routes(): void {
-    this.app.use('/accounts', AccountRouter);
+    this.app.use('/users', UserRouter);
   }
 }
 
