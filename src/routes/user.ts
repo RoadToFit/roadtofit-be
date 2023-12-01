@@ -11,7 +11,13 @@ class UserRoutes {
   }
 
   public routes(): void {
-    this.router.get('/register', UserController.register);
+    this.router.post('/register', UserController.register);
+    this.router.post('/login', UserController.login);
+    this.router.get('/', UserController.getUsers);
+    this.router.get('/:userId', UserController.getUserById);
+    this.router.put('/:userId', UserController.updateUserById);
+    this.router.put('/image/:userId', UserController.updateUserImageById);
+    this.router.delete('/:userId', UserController.deleteUserById);
   }
 }
 
