@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import Middleware from '../middleware/middleware';
 import HistoryController from '../controllers/history';
 
 class HistoryRoutes {
@@ -11,10 +12,10 @@ class HistoryRoutes {
   }
 
   public routes(): void {
-    this.router.get('/', HistoryController.getHistoryList);
-    this.router.get('/:userId', HistoryController.getHistoryListByUserId);
-    this.router.post('/', HistoryController.createHistory);
-    this.router.delete('/:historyId', HistoryController.deleteHistoryById);
+    this.router.get('/', Middleware.auth, HistoryController.getHistoryList);
+    this.router.get('/id', Middleware.auth, HistoryController.getHistoryListByUserId);
+    this.router.post('/', Middleware.auth, HistoryController.createHistory);
+    this.router.delete('/:historyId', Middleware.auth, HistoryController.deleteHistoryById);
   }
 }
 

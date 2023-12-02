@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import Middleware from '../middleware/middleware';
 import UserController from '../controllers/user';
 
 class UserRoutes {
@@ -16,10 +17,14 @@ class UserRoutes {
     this.router.post('/login', UserController.login);
 
     this.router.get('/', UserController.getUserList);
-    this.router.get('/:userId', UserController.getUserById);
-    this.router.put('/:userId', UserController.updateUserById);
-    this.router.put('/image/:userId', UserController.updateUserImageById);
-    this.router.delete('/:userId', UserController.deleteUserById);
+    this.router.get('/id', Middleware.auth, UserController.getUserById);
+    this.router.put('/', Middleware.auth, UserController.updateUserById);
+    this.router.put(
+      '/image/',
+      Middleware.auth,
+      UserController.updateUserImageById
+    );
+    this.router.delete('/', Middleware.auth, UserController.deleteUserById);
   }
 }
 

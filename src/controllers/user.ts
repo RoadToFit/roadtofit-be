@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import { hash, compare } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 import prisma from '../utils/db.server';
 
 type UserEntity = {
@@ -23,21 +25,39 @@ class UserController {
   });
 
   // TODO: Set username, password (encrypted), and name
-  register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  register = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { username, password, name } = req.body;
 
-      if (username === undefined
-        || password === undefined
-        || name === undefined
+      if (
+        username === undefined ||
+        password === undefined ||
+        name === undefined
       ) {
         throw new Error('Invalid request.');
       }
 
+      const data = await prisma.user.findFirst({
+        where: {
+          username,
+        },
+      });
+
+      if (data) {
+        throw new Error('Username already exist.');
+      }
+
+      // TODO: move salt hash to ENV
+      const hashed = await hash(password, 10);
+
       await prisma.user.create({
         data: {
           username,
-          password,
+          password: hashed,
           name,
         },
       });
@@ -56,10 +76,49 @@ class UserController {
   };
 
   // TODO:
-  login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
+      const { username, password } = req.body;
+
+      if (username === undefined || password === undefined) {
+        throw new Error('Invalid request.');
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          username,
+        },
+      });
+
+      if (!user) {
+        throw new Error('Username does not exist.');
+      }
+
+      const valid = await compare(password, user.password);
+
+      if (!valid) {
+        throw new Error('Incorrect password.');
+      }
+
+      const payload = {
+        userId: user.userId,
+        username: user.username,
+      };
+
+      // TODO: set secret to ENV
+      const token = sign(payload, 'ini secret', {
+        expiresIn: '1h',
+      });
+
       res.status(200);
-      res.send('Sample response');
+      res.json({
+        user: this._mapDocToUserEntity(user),
+        token,
+      });
 
       return next();
     } catch (err: any) {
@@ -71,7 +130,11 @@ class UserController {
     }
   };
 
-  getUserList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUserList = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const userList = await prisma.user.findMany();
 
@@ -90,9 +153,13 @@ class UserController {
     }
   };
 
-  getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUserById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      const { userId } = req.params;
+      const { userId } = req.body;
       const parsedUserId = parseInt(userId, 10);
 
       if (userId === undefined || Number.isNaN(parsedUserId)) {
@@ -127,18 +194,22 @@ class UserController {
     }
   };
 
-  updateUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  updateUserById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      const { userId } = req.params;
-      const { age, weight, height } = req.body;
+      const { userId, age, weight, height } = req.body;
 
       const parsedUserId = parseInt(userId, 10);
 
-      if (userId === undefined
-        || Number.isNaN(parsedUserId)
-        || age === undefined
-        || weight === undefined
-        || height === undefined
+      if (
+        userId === undefined ||
+        Number.isNaN(parsedUserId) ||
+        age === undefined ||
+        weight === undefined ||
+        height === undefined
       ) {
         throw new Error('Invalid request.');
       }
@@ -170,9 +241,13 @@ class UserController {
   };
 
   // TODO:
-  updateUserImageById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  updateUserImageById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      const { userId } = req.params;
+      const { userId } = req.body;
       const parsedUserId = parseInt(userId, 10);
 
       if (userId === undefined || Number.isNaN(parsedUserId)) {
@@ -206,9 +281,13 @@ class UserController {
     }
   };
 
-  deleteUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  deleteUserById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      const { userId } = req.params;
+      const { userId } = req.body;
       const parsedUserId = parseInt(userId, 10);
 
       if (userId === undefined || Number.isNaN(parsedUserId)) {

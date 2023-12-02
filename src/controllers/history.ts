@@ -20,13 +20,19 @@ class HistoryController {
     createdAt: new Date(doc.createdAt),
   });
 
-  getHistoryList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getHistoryList = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const historyList = await prisma.history.findMany();
 
       res.status(200);
       res.send({
-        historyList: historyList.map((history: any) => this._mapDocToHistoryEntity(history)),
+        historyList: historyList.map((history: any) =>
+          this._mapDocToHistoryEntity(history)
+        ),
       });
 
       return next();
@@ -43,10 +49,10 @@ class HistoryController {
   getHistoryListByUserId = async (
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId } = req.params;
+      const { userId } = req.body;
       const parsedUserId = parseInt(userId, 10);
 
       if (userId === undefined || Number.isNaN(parsedUserId)) {
@@ -61,7 +67,9 @@ class HistoryController {
 
       res.status(200);
       res.send({
-        historyList: historyList.map((history: any) => this._mapDocToHistoryEntity(history)),
+        historyList: historyList.map((history: any) =>
+          this._mapDocToHistoryEntity(history)
+        ),
       });
 
       return next();
@@ -75,19 +83,19 @@ class HistoryController {
     }
   };
 
-  createHistory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  createHistory = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      const {
-        userId,
-        weight,
-        height,
-        status,
-      } = req.body;
+      const { userId, weight, height, status } = req.body;
 
-      if (userId === undefined
-        || weight === undefined
-        || height === undefined
-        || status === undefined
+      if (
+        userId === undefined ||
+        weight === undefined ||
+        height === undefined ||
+        status === undefined
       ) {
         throw new Error('Invalid request.');
       }
@@ -115,7 +123,11 @@ class HistoryController {
     }
   };
 
-  deleteHistoryById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  deleteHistoryById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { historyId } = req.params;
       const parsedHistoryId = parseInt(historyId, 10);
