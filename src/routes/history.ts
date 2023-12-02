@@ -12,10 +12,18 @@ class HistoryRoutes {
   }
 
   public routes(): void {
-    this.router.get('/', Middleware.auth, HistoryController.getHistoryList);
-    this.router.get('/id', Middleware.auth, HistoryController.getHistoryListByUserId);
+    this.router.get('/list', Middleware.auth, HistoryController.getHistoryList);
+    this.router.get(
+      '/',
+      Middleware.auth,
+      HistoryController.getHistoryListByUserId
+    );
     this.router.post('/', Middleware.auth, HistoryController.createHistory);
-    this.router.delete('/:historyId', Middleware.auth, HistoryController.deleteHistoryById);
+    this.router.delete(
+      '/:historyId',
+      Middleware.auth,
+      HistoryController.deleteHistoryById
+    );
   }
 }
 

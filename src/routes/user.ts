@@ -16,8 +16,8 @@ class UserRoutes {
     this.router.post('/register', UserController.register);
     this.router.post('/login', UserController.login);
 
-    this.router.get('/', UserController.getUserList);
-    this.router.get('/id', Middleware.auth, UserController.getUserById);
+    this.router.get('/list', UserController.getUserList);
+    this.router.get('/', Middleware.auth, UserController.getUserById);
     this.router.put('/', Middleware.auth, UserController.updateUserById);
     this.router.put(
       '/image/',
