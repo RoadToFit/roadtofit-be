@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import { config as dotenv } from 'dotenv';
 
 import UserRouter from './routes/user';
+import HistoryRouter from './routes/history';
 
 class App {
   public app: Application;
@@ -20,6 +21,7 @@ class App {
 
   protected routes(): void {
     this.app.use('/users', UserRouter);
+    this.app.use('/histories', HistoryRouter);
   }
 }
 

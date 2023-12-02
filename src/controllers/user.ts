@@ -48,7 +48,8 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
@@ -63,25 +64,27 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
   };
 
-  getUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getUserList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const users = await prisma.user.findMany();
+      const userList = await prisma.user.findMany();
 
       res.status(200);
       res.send({
-        users: users.map((user: any) => this._mapDocToUserEntity(user)),
+        userList: userList.map((user: any) => this._mapDocToUserEntity(user)),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
@@ -117,7 +120,8 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
@@ -158,7 +162,8 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
@@ -194,7 +199,8 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
@@ -228,7 +234,8 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
 
       return next();
     }
