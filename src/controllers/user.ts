@@ -3,14 +3,56 @@ import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import prisma from '../utils/db.server';
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    UserEntity:
+ *      type: object
+ *      required:
+ *        - userId
+ *        - username
+ *        - name
+ *        - gender
+ *        - createdAt
+ *        - updatedAt
+ *      properties:
+ *        userId:
+ *          type: string
+ *        username:
+ *          type: string
+ *        name:
+ *          type: string
+ *        gender:
+ *          type: string
+ *        age:
+ *          type: number
+ *          nullable: true
+ *        weight:
+ *          type: number
+ *          nullable: true
+ *        height:
+ *          type: number
+ *          nullable: true
+ *        imageUrl:
+ *          type: string
+ *          nullable: true
+ *        createdAt:
+ *          type: string
+ *        updatedAt:
+ *          type: string
+ */
 type UserEntity = {
   userId: string;
   username: string;
   name: string;
+  gender: string;
   age: number | null;
   weight: number | null;
   height: number | null;
   imageUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 class UserController {
@@ -19,24 +61,52 @@ class UserController {
     username: doc.username,
     name: doc.name,
     age: doc.age,
+    gender: doc.gender,
     weight: doc.weight,
     height: doc.height,
     imageUrl: doc.imageUrl,
+    createdAt: new Date(doc.createdAt),
+    updatedAt: new Date(doc.updatedAt),
   });
 
-  // TODO: Set username, password (encrypted), and name
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    RegisterRequest:
+   *      type: object
+   *      required:
+   *        - username
+   *        - password
+   *        - name
+   *        - gender
+   *      properties:
+   *        username:
+   *          type: string
+   *          default: username
+   *        password:
+   *          type: password
+   *          default: password
+   *        name:
+   *          type: string
+   *          default: John Doe
+   *        gender:
+   *          type: string
+   *          default: MALE
+   */
   register = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { username, password, name } = req.body;
+      const { username, password, name, gender } = req.body;
 
       if (
         username === undefined ||
         password === undefined ||
-        name === undefined
+        name === undefined ||
+        gender === undefined
       ) {
         throw new Error('Invalid request.');
       }
@@ -51,7 +121,6 @@ class UserController {
         throw new Error('Username already exist.');
       }
 
-      // TODO: move salt hash to ENV
       const hashed = await hash(password, 10);
 
       await prisma.user.create({
@@ -59,6 +128,7 @@ class UserController {
           username,
           password: hashed,
           name,
+          gender,
         },
       });
 
@@ -75,7 +145,23 @@ class UserController {
     }
   };
 
-  // TODO:
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    LoginRequest:
+   *      type: object
+   *      required:
+   *        - username
+   *        - password
+   *      properties:
+   *        username:
+   *          type: string
+   *          default: username
+   *        password:
+   *          type: password
+   *          default: password
+   */
   login = async (
     req: Request,
     res: Response,

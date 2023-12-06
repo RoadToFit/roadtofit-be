@@ -15,6 +15,7 @@ model User {
   username                String                  @unique
   password                String
   name                    String
+  gender                  String
   age                     Int?
   weight                  Float?
   height                  Float?

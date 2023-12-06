@@ -1,6 +1,36 @@
 import { NextFunction, Request, Response } from 'express';
 import prisma from '../utils/db.server';
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    HistoryEntity:
+ *      type: object
+ *      required:
+ *        - historyId
+ *        - userId
+ *        - weight
+ *        - height
+ *        - status
+ *        - createdAt
+ *        - updatedAt
+ *      properties:
+ *        historyId:
+ *          type: string
+ *        userId:
+ *          type: string
+ *        weight:
+ *          type: number
+ *        height:
+ *          type: number
+ *        status:
+ *          type: string
+ *        createdAt:
+ *          type: string
+ *        updatedAt:
+ *          type: string
+ */
 type HistoryEntity = {
   historyId: string;
   userId: number;
@@ -8,6 +38,7 @@ type HistoryEntity = {
   height: number;
   status: string;
   createdAt: Date;
+  updatedAt: Date;
 };
 
 class HistoryController {
@@ -18,6 +49,7 @@ class HistoryController {
     weight: doc.weight,
     height: doc.height,
     createdAt: new Date(doc.createdAt),
+    updatedAt: new Date(doc.updatedAt),
   });
 
   getHistoryList = async (
