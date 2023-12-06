@@ -28,8 +28,5 @@ ENV NODE_ENV production
 # Expose port
 EXPOSE 4000
 
-# Generate prisma client
-RUN npx prisma generate
-
 # Run the web service on container startup.
 CMD [ "node", "dist/server.js" ]
