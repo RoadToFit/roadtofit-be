@@ -8,7 +8,8 @@
     "test:lint": "eslint . --ext .ts",
     "build": "rimraf dist && tsc",
     "dev": "ts-node-dev ./src/server.ts",
-    "start": "node ./dist/server.js"
+    "start": "node ./dist/server.js",
+    "postinstall": "npx prisma generate"
   },
   "keywords": [],
   "author": "",
