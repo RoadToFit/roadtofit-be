@@ -21,9 +21,16 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - name: Build and push image to Google Container Registry
+      - name: Authenticate Docker
         run: |
-          gcloud builds submit --tag ${{ secrets.GCP_REPO_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/roadtofit-repo/roadtofit-be
+          gcloud auth configure-docker ${{ env.GCP_REPO_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build image
+        working-directory: ./
+        run: docker build . --file Dockerfile --tag ${{ secrets.GCP_REPO_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/roadtofit-repo/roadtofit-be
+
+      - name: Push image
+        run: docker push ${{ secrets.GCP_REPO_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/roadtofit-repo/roadtofit-be
 
       - name: Deploy image to Google Cloud Run
         run: |
