@@ -108,7 +108,9 @@ class UserController {
         name === undefined ||
         gender === undefined
       ) {
-        throw new Error('Invalid request.');
+        res.status(400);
+        res.json({ message: 'Invalid request body' });
+        throw new Error('Invalid request body');
       }
 
       const data = await prisma.user.findFirst({
@@ -118,7 +120,9 @@ class UserController {
       });
 
       if (data) {
-        throw new Error('Username already exist.');
+        res.status(404);
+        res.json({ message: 'Username already exist' });
+        throw new Error('Username already exist');
       }
 
       const hashed = await hash(password, 10);
@@ -133,7 +137,7 @@ class UserController {
       });
 
       res.status(200);
-      res.send('User sucessfully created.');
+      res.json({ message: 'User sucessfully created' });
 
       return next();
     } catch (err: any) {
@@ -171,7 +175,9 @@ class UserController {
       const { username, password } = req.body;
 
       if (username === undefined || password === undefined) {
-        throw new Error('Invalid request.');
+        res.status(400);
+        res.json({ message: 'Invalid request body' });
+        throw new Error('Invalid request body');
       }
 
       const user = await prisma.user.findFirst({
@@ -181,13 +187,17 @@ class UserController {
       });
 
       if (!user) {
-        throw new Error('Username does not exist.');
+        res.status(404);
+        res.json({ message: 'Username does not exist' });
+        throw new Error('Username does not exist');
       }
 
       const valid = await compare(password, user.password);
 
       if (!valid) {
-        throw new Error('Incorrect password.');
+        res.status(401);
+        res.json({ message: 'Incorrect password' });
+        throw new Error('Incorrect password');
       }
 
       const payload = {
