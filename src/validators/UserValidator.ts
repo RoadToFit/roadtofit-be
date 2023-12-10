@@ -16,7 +16,7 @@ const register = Joi.object().keys({
       .valid('MALE', 'FEMALE')
       .error(new Error('Invalid gender format')),
   })
-})
+}).unknown();
 
 const login = Joi.object().keys({
   body: Joi.object().keys({
@@ -27,32 +27,35 @@ const login = Joi.object().keys({
       .required()
       .error(new Error('Invalid password format')),
   })
-})
+}).unknown();
 
 const updateById = Joi.object().keys({
   body: Joi.object().keys({
-    userId: Joi.string()
+    userId: Joi.number()
       .required()
       .error(new Error('Invalid userId format')),
+    name: Joi.string()
+      .optional()
+      .error(new Error('Invalid name format')),
     age: Joi.number()
-      .required()
+      .optional()
       .error(new Error('Invalid age format')),
     weight: Joi.number()
-      .required()
+      .optional()
       .error(new Error('Invalid weight format')),
     height: Joi.number()
-      .required()
+      .optional()
       .error(new Error('Invalid height format')),
   })
-})
+}).unknown();
 
 const updateImageById = Joi.object().keys({
   body: Joi.object().keys({
-    userId: Joi.string()
+    userId: Joi.number()
       .required()
       .error(new Error('Invalid userId format')),
   })
-})
+}).unknown();
 
 export {
   register,

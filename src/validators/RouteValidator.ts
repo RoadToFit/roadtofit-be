@@ -7,7 +7,7 @@ const bearerToken = Joi.object().keys({
       .required()
       .error(new Error('Invalid access token format')),
   }).unknown(),
-})
+}).unknown();
 
 export {
   bearerToken,
