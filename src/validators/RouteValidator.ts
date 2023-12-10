@@ -9,6 +9,15 @@ const bearerToken = Joi.object().keys({
   }).unknown(),
 }).unknown();
 
+const historyIdParam = Joi.object().keys({
+  params: Joi.object().keys({
+    historyId: Joi.string()
+      .required()
+      .error(new Error('Invalid historyId format')),
+  }).unknown(),
+}).unknown();
+
 export {
   bearerToken,
+  historyIdParam
 }

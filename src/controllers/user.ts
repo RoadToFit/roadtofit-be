@@ -85,7 +85,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 
@@ -166,7 +166,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 
@@ -189,7 +189,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 
@@ -224,7 +224,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 
@@ -279,7 +279,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 
@@ -347,7 +347,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 
@@ -381,7 +381,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next(err);
+      return next(new Error(err.message));
     }
   };
 }

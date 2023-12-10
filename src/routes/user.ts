@@ -91,6 +91,7 @@ class UserRoutes {
      */
     this.router.get(
       '/list',
+      validator(RouteValidator.bearerToken),
       Middleware.auth,
       UserController.getList,
     );

@@ -13,7 +13,7 @@
  *        - updatedAt
  *      properties:
  *        userId:
- *          type: string
+ *          type: number
  *        username:
  *          type: string
  *        name:
