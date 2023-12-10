@@ -1,59 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
-import prisma from '../utils/db.server';
 
-/**
- * @openapi
- * components:
- *  schemas:
- *    UserEntity:
- *      type: object
- *      required:
- *        - userId
- *        - username
- *        - name
- *        - gender
- *        - createdAt
- *        - updatedAt
- *      properties:
- *        userId:
- *          type: string
- *        username:
- *          type: string
- *        name:
- *          type: string
- *        gender:
- *          type: string
- *        age:
- *          type: number
- *          nullable: true
- *        weight:
- *          type: number
- *          nullable: true
- *        height:
- *          type: number
- *          nullable: true
- *        imageUrl:
- *          type: string
- *          nullable: true
- *        createdAt:
- *          type: string
- *        updatedAt:
- *          type: string
- */
-type UserEntity = {
-  userId: string;
-  username: string;
-  name: string;
-  gender: string;
-  age: number | null;
-  weight: number | null;
-  height: number | null;
-  imageUrl: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import { UserEntity } from '../entities/User';
+// import * as StorageController from "./Storage";
+import prisma from '../utils/db.server';
 
 class UserController {
   private _mapDocToUserEntity = (doc: any): UserEntity => ({
@@ -102,17 +53,6 @@ class UserController {
     try {
       const { username, password, name, gender } = req.body;
 
-      if (
-        username === undefined ||
-        password === undefined ||
-        name === undefined ||
-        gender === undefined
-      ) {
-        res.status(400);
-        res.json({ message: 'Invalid request body' });
-        throw new Error('Invalid request body');
-      }
-
       const data = await prisma.user.findFirst({
         where: {
           username,
@@ -145,7 +85,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 
@@ -165,6 +105,16 @@ class UserController {
    *        password:
    *          type: password
    *          default: password
+   *    LoginResponse:
+   *      type: object
+   *      required:
+   *        - user
+   *        - token
+   *      properties:
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   *        token:
+   *          type: string
    */
   login = async (
     req: Request,
@@ -174,12 +124,6 @@ class UserController {
     try {
       const { username, password } = req.body;
 
-      if (username === undefined || password === undefined) {
-        res.status(400);
-        res.json({ message: 'Invalid request body' });
-        throw new Error('Invalid request body');
-      }
-
       const user = await prisma.user.findFirst({
         where: {
           username,
@@ -188,16 +132,16 @@ class UserController {
 
       if (!user) {
         res.status(404);
-        res.json({ message: 'Username does not exist' });
-        throw new Error('Username does not exist');
+        res.json({ message: 'Wrong credentials' });
+        throw new Error('Wrong credentials');
       }
 
       const valid = await compare(password, user.password);
 
       if (!valid) {
         res.status(401);
-        res.json({ message: 'Incorrect password' });
-        throw new Error('Incorrect password');
+        res.json({ message: 'Wrong credentials' });
+        throw new Error('Wrong credentials');
       }
 
       const payload = {
@@ -222,11 +166,11 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 
-  getUserList = async (
+  getList = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -235,7 +179,7 @@ class UserController {
       const userList = await prisma.user.findMany();
 
       res.status(200);
-      res.send({
+      res.json({
         userList: userList.map((user: any) => this._mapDocToUserEntity(user)),
       });
 
@@ -245,26 +189,20 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 
-  getUserById = async (
+  getById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
       const { userId } = req.body;
-      const parsedUserId = parseInt(userId, 10);
-
-      if (userId === undefined || Number.isNaN(parsedUserId)) {
-        throw new Error('Invalid request.');
-      }
-
       const user = await prisma.user.findUnique({
         where: {
-          userId: parsedUserId,
+          userId,
         },
       });
 
@@ -276,7 +214,7 @@ class UserController {
       }
 
       res.status(200);
-      res.send({
+      res.json({
         user: this._mapDocToUserEntity(user),
       });
 
@@ -286,35 +224,44 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 
-  updateUserById = async (
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    UpdateByIdRequest:
+   *      type: object
+   *      properties:
+   *        name:
+   *          type: string
+   *          default: name
+   *        age:
+   *          type: number
+   *          default: 15
+   *        weight:
+   *          type: number
+   *          default: 150
+   *        height:
+   *          type: number
+   *          default: 50
+   */
+  updateById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId, age, weight, height } = req.body;
-
-      const parsedUserId = parseInt(userId, 10);
-
-      if (
-        userId === undefined ||
-        Number.isNaN(parsedUserId) ||
-        age === undefined ||
-        weight === undefined ||
-        height === undefined
-      ) {
-        throw new Error('Invalid request.');
-      }
+      const { userId, name, age, weight, height } = req.body;
 
       const user = await prisma.user.update({
         where: {
-          userId: parsedUserId,
+          userId,
         },
         data: {
+          name,
           age,
           weight,
           height,
@@ -322,7 +269,7 @@ class UserController {
       });
 
       res.status(200);
-      res.send({
+      res.json({
         user: this._mapDocToUserEntity(user),
       });
 
@@ -332,40 +279,67 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 
   // TODO:
-  updateUserImageById = async (
+  updateImageById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
+      /*
       const { userId } = req.body;
-      const parsedUserId = parseInt(userId, 10);
 
-      if (userId === undefined || Number.isNaN(parsedUserId)) {
-        throw new Error('Invalid request.');
+      if (!req.file) {
+        res.status(400)
+        res.send({ message: "Please upload a file!" });
+
+        return next();
       }
 
-      // TODO: Upload and get URL
-      const imageUrl = '';
+      const blob = StorageController.bucket.file(req.file.originalname);
+      const blobStream = blob.createWriteStream();
 
-      const user = await prisma.user.update({
-        where: {
-          userId: parsedUserId,
-        },
-        data: {
-          imageUrl,
-        },
-      });
+      blobStream.on('error', (err: any) => {
+        res.status(500)
+        res.send({ message: err.message });
 
-      res.status(200);
-      res.send({
-        user: this._mapDocToUserEntity(user),
-      });
+        return next();
+      })
+
+      // eslint-disable-next-line consistent-return
+      blobStream.on('finish', async () => {
+        const publicUrl = `https://storage.googleapis.com/${StorageController.bucket.name}/${blob.name}`;
+
+        try {
+          await StorageController.bucket.file(req.file!.originalname).makePublic();
+        } catch {
+          res.status(500)
+          res.send({ message: `Public access denied of ${publicUrl}` });
+
+          return next();
+        }
+
+        const user = await prisma.user.update({
+          where: {
+            userId,
+          },
+          data: {
+            imageUrl: publicUrl,
+          },
+        });
+
+        res.status(200);
+        res.json({
+          user: this._mapDocToUserEntity(user),
+        });
+      })
+
+      blobStream.end(req.file.buffer);
+      */
 
       return next();
     } catch (err: any) {
@@ -373,26 +347,21 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 
-  deleteUserById = async (
+  deleteById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
       const { userId } = req.body;
-      const parsedUserId = parseInt(userId, 10);
-
-      if (userId === undefined || Number.isNaN(parsedUserId)) {
-        throw new Error('Invalid request.');
-      }
 
       const user = await prisma.user.delete({
         where: {
-          userId: parsedUserId,
+          userId,
         },
       });
 
@@ -404,7 +373,7 @@ class UserController {
       }
 
       res.status(200);
-      res.send('User successfully deleted.');
+      res.json({ message: 'User sucessfully deleted' });
 
       return next();
     } catch (err: any) {
@@ -412,7 +381,7 @@ class UserController {
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(err);
     }
   };
 }
