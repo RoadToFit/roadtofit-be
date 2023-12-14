@@ -1,7 +1,12 @@
 import { Router } from 'express';
 
 import Middleware from '../middleware/middleware';
-import UserController from '../controllers/user';
+import UserController from '../controllers/User';
+import * as DataController from '../controllers/Data';
+
+import validator from '../utils/validator';
+import * as UserValidator from '../validators/UserValidator'
+import * as RouteValidator from '../validators/RouteValidator'
 
 class UserRoutes {
   public router: Router;
@@ -32,6 +37,7 @@ class UserRoutes {
      */
     this.router.post(
       '/register',
+      validator(UserValidator.register),
       UserController.register,
     );
 
@@ -51,9 +57,17 @@ class UserRoutes {
      *            $ref: '#/components/schemas/LoginRequest'
      *    responses:
      *      200:
-     *        description: User sucessfully created.
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/LoginResponse'
      */
-    this.router.post('/login', UserController.login);
+    this.router.post(
+      '/login',
+      validator(UserValidator.login),
+      UserController.login,
+    );
 
     /**
      * @openapi
@@ -71,11 +85,15 @@ class UserRoutes {
      *              type: object
      *              properties:
      *                userList:
-     *                  $ref: '#/components/schemas/UserEntity'
+     *                  type: array
+     *                  items:
+     *                    $ref: '#/components/schemas/UserEntity'
      */
     this.router.get(
       '/list',
-      UserController.getUserList,
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
+      UserController.getList,
     );
     
     /**
@@ -93,13 +111,14 @@ class UserRoutes {
      *            schema:
      *              type: object
      *              properties:
-     *                userList:
+     *                user:
      *                  $ref: '#/components/schemas/UserEntity'
      */
     this.router.get(
       '/',
+      validator(RouteValidator.bearerToken),
       Middleware.auth,
-      UserController.getUserById,
+      UserController.getById,
     );
 
     /**
@@ -109,6 +128,11 @@ class UserRoutes {
      *    tags:
      *      - User
      *    summary: Update a user by id
+     *    requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *            $ref: '#/components/schemas/UpdateByIdRequest'
      *    responses:
      *      200:
      *        description: Success
@@ -117,13 +141,15 @@ class UserRoutes {
      *            schema:
      *              type: object
      *              properties:
-     *                userList:
+     *                user:
      *                  $ref: '#/components/schemas/UserEntity'
      */
     this.router.put(
       '/',
+      validator(RouteValidator.bearerToken),
       Middleware.auth,
-      UserController.updateUserById,
+      validator(UserValidator.updateById),
+      UserController.updateById,
     );
 
     /**
@@ -141,13 +167,14 @@ class UserRoutes {
      *            schema:
      *              type: object
      *              properties:
-     *                userList:
+     *                user:
      *                  $ref: '#/components/schemas/UserEntity'
      */
     this.router.put(
       '/image/',
       Middleware.auth,
-      UserController.updateUserImageById
+      DataController.uploadData.single('file'),
+      UserController.updateImageById
     );
 
     /**
@@ -160,18 +187,11 @@ class UserRoutes {
      *    responses:
      *      200:
      *        description: Success
-     *        content:
-     *          application/json:
-     *            schema:
-     *              type: object
-     *              properties:
-     *                userList:
-     *                  $ref: '#/components/schemas/UserEntity'
      */
     this.router.delete(
       '/',
       Middleware.auth,
-      UserController.deleteUserById,
+      UserController.deleteById,
     );
   }
 }

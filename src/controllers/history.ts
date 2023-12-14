@@ -1,58 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
+import { HistoryEntity } from 'entities/History';
 import prisma from '../utils/db.server';
-
-/**
- * @openapi
- * components:
- *  schemas:
- *    HistoryEntity:
- *      type: object
- *      required:
- *        - historyId
- *        - userId
- *        - weight
- *        - height
- *        - status
- *        - createdAt
- *        - updatedAt
- *      properties:
- *        historyId:
- *          type: string
- *        userId:
- *          type: string
- *        weight:
- *          type: number
- *        height:
- *          type: number
- *        status:
- *          type: string
- *        createdAt:
- *          type: string
- *        updatedAt:
- *          type: string
- */
-type HistoryEntity = {
-  historyId: string;
-  userId: number;
-  weight: number;
-  height: number;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 class HistoryController {
   private _mapDocToHistoryEntity = (doc: any): HistoryEntity => ({
     historyId: doc.historyId,
     userId: doc.userId,
-    status: doc.status,
-    weight: doc.weight,
-    height: doc.height,
+    historyType: doc.historyType,
+    result: doc.result,
+    description: doc.description,
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),
   });
 
-  getHistoryList = async (
+  getList = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -61,7 +22,7 @@ class HistoryController {
       const historyList = await prisma.history.findMany();
 
       res.status(200);
-      res.send({
+      res.json({
         historyList: historyList.map((history: any) =>
           this._mapDocToHistoryEntity(history)
         ),
@@ -70,35 +31,29 @@ class HistoryController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(new Error(err.message));
     }
   };
 
-  getHistoryListByUserId = async (
+  getListByUserId = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
       const { userId } = req.body;
-      const parsedUserId = parseInt(userId, 10);
-
-      if (userId === undefined || Number.isNaN(parsedUserId)) {
-        throw new Error('Invalid request.');
-      }
 
       const historyList = await prisma.history.findMany({
         where: {
-          userId: parsedUserId,
+          userId,
         },
       });
 
       res.status(200);
-      res.send({
+      res.json({
         historyList: historyList.map((history: any) =>
           this._mapDocToHistoryEntity(history)
         ),
@@ -107,51 +62,65 @@ class HistoryController {
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    CreateHistoryRequest:
+   *      type: object
+   *      required:
+   *        - userId
+   *        - historyType
+   *        - result
+   *        - description
+   *      properties:
+   *        userId:
+   *          type: string
+   *          default: userId
+   *        historyType:
+   *          type: string
+   *          default: BMI
+   *        result:
+   *          type: string
+   *          default: result
+   *        description:
+   *          type: string
+   *          default: description
+   */
   createHistory = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId, weight, height, status } = req.body;
-
-      if (
-        userId === undefined ||
-        weight === undefined ||
-        height === undefined ||
-        status === undefined
-      ) {
-        throw new Error('Invalid request.');
-      }
+      const { userId, historyType, result, description } = req.body;
 
       await prisma.history.create({
         data: {
           userId,
-          weight,
-          height,
-          status,
+          historyType,
+          result,
+          description,
         },
       });
 
       res.status(200);
-      res.send('History sucessfully created.');
+      res.json({ message: 'History sucessfully created' });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(new Error(err.message));
     }
   };
 
@@ -162,15 +131,10 @@ class HistoryController {
   ): Promise<void> => {
     try {
       const { historyId } = req.params;
-      const parsedHistoryId = parseInt(historyId, 10);
-
-      if (historyId === undefined || Number.isNaN(parsedHistoryId)) {
-        throw new Error('Invalid request.');
-      }
 
       const history = await prisma.history.delete({
         where: {
-          historyId: parsedHistoryId,
+          historyId: parseInt(historyId, 10),
         },
       });
 
@@ -182,16 +146,15 @@ class HistoryController {
       }
 
       res.status(200);
-      res.send('History successfully deleted.');
+      res.json({ message: 'History sucessfully deleted' });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      res.send(err.message);
       // eslint-disable-next-line no-console
       console.log(err.message);
 
-      return next();
+      return next(new Error(err.message));
     }
   };
 }

@@ -4,8 +4,8 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { config as dotenv } from 'dotenv';
 
-import UserRouter from './routes/user';
-import HistoryRouter from './routes/history';
+import UserRouter from './routes/User';
+import HistoryRouter from './routes/History';
 
 import swaggerDocs from './utils/swagger';
 
