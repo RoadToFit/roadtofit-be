@@ -159,6 +159,15 @@ class UserRoutes {
      *    tags:
      *      - User
      *    summary: Update a user image by id
+     *    requestBody:
+     *      content:
+     *        multipart/form-data:
+     *          schema:
+     *            type: object
+     *            properties:
+     *              file:
+     *                type: string
+     *                format: binary
      *    responses:
      *      200:
      *        description: Success
@@ -173,13 +182,13 @@ class UserRoutes {
     this.router.put(
       '/image/',
       Middleware.auth,
-      DataController.uploadData.single('file'),
+      DataController.upload.single('file'),
       UserController.updateImageById
     );
 
     /**
      * @openapi
-     * '/users/image':
+     * '/users':
      *  delete:
      *    tags:
      *      - User

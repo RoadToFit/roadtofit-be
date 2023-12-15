@@ -283,63 +283,34 @@ class UserController {
     }
   };
 
-  // TODO:
   updateImageById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      /*
       const { userId } = req.body;
 
       if (!req.file) {
         res.status(400)
-        res.send({ message: "Please upload a file!" });
+        res.send({ message: "No image uploaded" });
 
         return next();
       }
 
-      const blob = StorageController.bucket.file(req.file.originalname);
-      const blobStream = blob.createWriteStream();
+      const user = await prisma.user.update({
+        where: {
+          userId,
+        },
+        data: {
+          imageUrl: `https://storage.googleapis.com/roadtofit-bucket/${req.file.path}`,
+        },
+      });
 
-      blobStream.on('error', (err: any) => {
-        res.status(500)
-        res.send({ message: err.message });
-
-        return next();
-      })
-
-      // eslint-disable-next-line consistent-return
-      blobStream.on('finish', async () => {
-        const publicUrl = `https://storage.googleapis.com/${StorageController.bucket.name}/${blob.name}`;
-
-        try {
-          await StorageController.bucket.file(req.file!.originalname).makePublic();
-        } catch {
-          res.status(500)
-          res.send({ message: `Public access denied of ${publicUrl}` });
-
-          return next();
-        }
-
-        const user = await prisma.user.update({
-          where: {
-            userId,
-          },
-          data: {
-            imageUrl: publicUrl,
-          },
-        });
-
-        res.status(200);
-        res.json({
-          user: this._mapDocToUserEntity(user),
-        });
-      })
-
-      blobStream.end(req.file.buffer);
-      */
+      res.status(200);
+      res.json({
+        user: this._mapDocToUserEntity(user),
+      });
 
       return next();
     } catch (err: any) {
