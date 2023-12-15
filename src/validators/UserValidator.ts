@@ -54,7 +54,7 @@ const updateImageById = Joi.object().keys({
     userId: Joi.number()
       .required()
       .error(new Error('Invalid userId format')),
-  })
+  }).unknown(),
 }).unknown();
 
 export {

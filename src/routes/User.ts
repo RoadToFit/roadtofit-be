@@ -181,8 +181,10 @@ class UserRoutes {
      */
     this.router.put(
       '/image/',
-      Middleware.auth,
+      validator(RouteValidator.bearerToken),
       DataController.upload.single('file'),
+      Middleware.auth,
+      validator(UserValidator.updateImageById),
       UserController.updateImageById
     );
 
