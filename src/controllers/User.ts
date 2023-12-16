@@ -180,9 +180,17 @@ class UserController {
     try {
       const userList = await prisma.user.findMany({
         include: {
-          foodRecommendations: true,
-          activityRecommendations: true,
-        },
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       res.status(200);
@@ -212,9 +220,17 @@ class UserController {
           userId,
         },
         include: {
-          foodRecommendations: true,
-          activityRecommendations: true,
-        },
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       if (!user) {
@@ -270,9 +286,17 @@ class UserController {
           age,
         },
         include: {
-          foodRecommendations: true,
-          activityRecommendations: true,
-        },
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       res.status(200);
@@ -312,27 +336,40 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId, foodRecommendations, activityRecommendations } = req.body;
+      const { userId, bmi, foodRecommendations, activityRecommendations } = req.body;
 
       const user = await prisma.user.update({
         where: {
           userId,
         },
         data: {
+          bmi,
           foodRecommendations: {
-            connect: foodRecommendations.map((id: number) => ({
-              userId_foodId: { userId, foodId: id }
+            create: foodRecommendations.map((id: number) => ({
+              food: { 
+                connect: { foodId: id }
+              }
             }))
           },
           activityRecommendations: {
-            connect: activityRecommendations.map((id: number) => ({
-              userId_activityId: { userId, activityId: id }
+            create: activityRecommendations.map((id: number) => ({
+              activity: { 
+                connect: { activityId: id }
+              }
             }))
           }
         },
         include: {
-          foodRecommendations: true,
-          activityRecommendations: true,
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
         },    
       });
 
@@ -374,9 +411,17 @@ class UserController {
           imageUrl: `https://storage.googleapis.com/roadtofit-bucket/${req.file.path}`,
         },
         include: {
-          foodRecommendations: true,
-          activityRecommendations: true,
-        },
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       res.status(200);
@@ -407,9 +452,17 @@ class UserController {
           userId,
         },
         include: {
-          foodRecommendations: true,
-          activityRecommendations: true,
-        },
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       if (!user) {
