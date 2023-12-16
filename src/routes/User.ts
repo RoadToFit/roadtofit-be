@@ -151,6 +151,36 @@ class UserRoutes {
       validator(UserValidator.updateById),
       UserController.updateById,
     );
+    
+    /**
+     * @openapi
+     * '/users/recommendation':
+     *  put:
+     *    tags:
+     *      - User
+     *    summary: Update a user by id
+     *    requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *            $ref: '#/components/schemas/UpdateRecommendationByIdRequest'
+     *    responses:
+     *      200:
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              type: object
+     *              properties:
+     *                user:
+     *                  $ref: '#/components/schemas/UserEntity'
+     */
+    this.router.put(
+      '/recommendation',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
+      UserController.updateRecommendationById,
+    );
 
     /**
      * @openapi

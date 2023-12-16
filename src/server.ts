@@ -5,7 +5,8 @@ import morgan from 'morgan';
 import { config as dotenv } from 'dotenv';
 
 import UserRouter from './routes/User';
-import HistoryRouter from './routes/History';
+import FoodRouter from './routes/Food';
+import ActivityRouter from './routes/Activity';
 
 import swaggerDocs from './utils/swagger';
 
@@ -28,7 +29,8 @@ class App {
 
   protected routes(): void {
     this.app.use('/users', UserRouter);
-    this.app.use('/histories', HistoryRouter);
+    this.app.use('/foods', FoodRouter);
+    this.app.use('/activities', ActivityRouter);
   }
 }
 

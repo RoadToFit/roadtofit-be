@@ -13,8 +13,10 @@ class UserController {
     name: doc.name,
     age: doc.age,
     gender: doc.gender,
-    weight: doc.weight,
-    height: doc.height,
+    bodyType: doc.bodyType,
+    bmi: doc.bmi,
+    foodRecommendations: doc.foodRecommendations || [],
+    activityRecommendations: doc.activityRecommendations || [],
     imageUrl: doc.imageUrl,
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),
@@ -176,7 +178,12 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userList = await prisma.user.findMany();
+      const userList = await prisma.user.findMany({
+        include: {
+          foodRecommendations: true,
+          activityRecommendations: true,
+        },
+      });
 
       res.status(200);
       res.json({
@@ -203,6 +210,10 @@ class UserController {
       const user = await prisma.user.findUnique({
         where: {
           userId,
+        },
+        include: {
+          foodRecommendations: true,
+          activityRecommendations: true,
         },
       });
 
@@ -241,12 +252,6 @@ class UserController {
    *        age:
    *          type: number
    *          default: 15
-   *        weight:
-   *          type: number
-   *          default: 150
-   *        height:
-   *          type: number
-   *          default: 50
    */
   updateById = async (
     req: Request,
@@ -254,7 +259,7 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId, name, age, weight, height } = req.body;
+      const { userId, name, age } = req.body;
 
       const user = await prisma.user.update({
         where: {
@@ -263,9 +268,72 @@ class UserController {
         data: {
           name,
           age,
-          weight,
-          height,
         },
+        include: {
+          foodRecommendations: true,
+          activityRecommendations: true,
+        },
+      });
+
+      res.status(200);
+      res.json({
+        user: this._mapDocToUserEntity(user),
+      });
+
+      return next();
+    } catch (err: any) {
+      res.status(500);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
+
+      return next(new Error(err.message));
+    }
+  };
+
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    UpdateRecommendationByIdRequest:
+   *      type: object
+   *      properties:
+   *        foodRecommendations:
+   *          type: array
+   *          items:
+   *            type: number
+   *        activityRecommendations:
+   *          type: array
+   *          items:
+   *            type: number
+   */
+  updateRecommendationById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { userId, foodRecommendations, activityRecommendations } = req.body;
+
+      const user = await prisma.user.update({
+        where: {
+          userId,
+        },
+        data: {
+          foodRecommendations: {
+            connect: foodRecommendations.map((id: number) => ({
+              userId_foodId: { userId, foodId: id }
+            }))
+          },
+          activityRecommendations: {
+            connect: activityRecommendations.map((id: number) => ({
+              userId_activityId: { userId, activityId: id }
+            }))
+          }
+        },
+        include: {
+          foodRecommendations: true,
+          activityRecommendations: true,
+        },    
       });
 
       res.status(200);
@@ -305,6 +373,10 @@ class UserController {
         data: {
           imageUrl: `https://storage.googleapis.com/roadtofit-bucket/${req.file.path}`,
         },
+        include: {
+          foodRecommendations: true,
+          activityRecommendations: true,
+        },
       });
 
       res.status(200);
@@ -333,6 +405,10 @@ class UserController {
       const user = await prisma.user.delete({
         where: {
           userId,
+        },
+        include: {
+          foodRecommendations: true,
+          activityRecommendations: true,
         },
       });
 

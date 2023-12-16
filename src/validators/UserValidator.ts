@@ -40,12 +40,6 @@ const updateById = Joi.object().keys({
     age: Joi.number()
       .optional()
       .error(new Error('Invalid age format')),
-    weight: Joi.number()
-      .optional()
-      .error(new Error('Invalid weight format')),
-    height: Joi.number()
-      .optional()
-      .error(new Error('Invalid height format')),
   })
 }).unknown();
 
