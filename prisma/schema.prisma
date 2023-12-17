@@ -58,7 +58,7 @@ model Activity {
 model UserFoodRecommendations {
   user                    User                    @relation(fields: [userId], references: [userId])
   userId                  Int
-  food                    Food                    @relation(fields: [foodId], references: [foodId])
+  food                    Food                    @relation(fields: [foodId], references: [foodId], onDelete: Cascade)
   foodId                  Int
 
   @@id([userId, foodId])
@@ -67,7 +67,7 @@ model UserFoodRecommendations {
 model UserActivityRecommendations {
   user                    User                    @relation(fields: [userId], references: [userId])
   userId                  Int
-  activity                Activity                @relation(fields: [activityId], references: [activityId])
+  activity                Activity                @relation(fields: [activityId], references: [activityId], onDelete: Cascade)
   activityId              Int
 
   @@id([userId, activityId])

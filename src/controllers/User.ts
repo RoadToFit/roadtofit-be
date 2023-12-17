@@ -46,6 +46,18 @@ class UserController {
    *        gender:
    *          type: string
    *          default: MALE
+   *    RegisterResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: User sucessfully created
    */
   register = async (
     req: Request,
@@ -63,7 +75,10 @@ class UserController {
 
       if (data) {
         res.status(404);
-        res.json({ message: 'Username already exist' });
+        res.json({ 
+          success: false,
+          message: 'Username already exist'
+        });
         throw new Error('Username already exist');
       }
 
@@ -79,7 +94,10 @@ class UserController {
       });
 
       res.status(200);
-      res.json({ message: 'User sucessfully created' });
+      res.json({
+        success: true,
+        message: 'User sucessfully created',
+      });
 
       return next();
     } catch (err: any) {
@@ -112,7 +130,15 @@ class UserController {
    *      required:
    *        - user
    *        - token
+   *        - success
+   *        - message
    *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: Login success
    *        user:
    *          $ref: '#/components/schemas/UserEntity'
    *        token:
@@ -134,7 +160,10 @@ class UserController {
 
       if (!user) {
         res.status(404);
-        res.json({ message: 'Wrong credentials' });
+        res.json({
+          status: false,
+          message: 'Wrong credentials',
+        });
         throw new Error('Wrong credentials');
       }
 
@@ -142,7 +171,10 @@ class UserController {
 
       if (!valid) {
         res.status(401);
-        res.json({ message: 'Wrong credentials' });
+        res.json({
+          status: false,
+          message: 'Wrong credentials',
+        });
         throw new Error('Wrong credentials');
       }
 
@@ -158,6 +190,8 @@ class UserController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: 'Login success',
         user: this._mapDocToUserEntity(user),
         token,
       });
@@ -172,6 +206,29 @@ class UserController {
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GetUserListResponse:
+   *      type: object
+   *      required:
+   *        - user
+   *        - token
+   *        - success
+   *        - message
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: Login success
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   *        token:
+   *          type: string
+   */
   getList = async (
     req: Request,
     res: Response,
@@ -195,6 +252,8 @@ class UserController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: 'OK',
         userList: userList.map((user: any) => this._mapDocToUserEntity(user)),
       });
 
@@ -234,14 +293,19 @@ class UserController {
       });
 
       if (!user) {
-        res.status(204);
-        res.send();
+        res.status(404);
+        res.json({
+          success: false,
+          message: 'User not found',
+        });
 
         return next();
       }
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         user: this._mapDocToUserEntity(user),
       });
 
@@ -259,7 +323,7 @@ class UserController {
    * @openapi
    * components:
    *  schemas:
-   *    UpdateByIdRequest:
+   *    UpdateUserByIdRequest:
    *      type: object
    *      properties:
    *        name:
@@ -301,6 +365,8 @@ class UserController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         user: this._mapDocToUserEntity(user),
       });
 
@@ -375,6 +441,8 @@ class UserController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         user: this._mapDocToUserEntity(user),
       });
 
@@ -426,6 +494,8 @@ class UserController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         user: this._mapDocToUserEntity(user),
       });
 
@@ -466,8 +536,11 @@ class UserController {
       });
 
       if (!user) {
-        res.status(204);
-        res.send();
+        res.status(404);
+        res.json({
+          success: false,
+          message: 'User not found',
+        });
 
         return next();
       }

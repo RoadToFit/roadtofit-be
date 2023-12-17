@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 // import Middleware from '../middleware/middleware';
 import ActivityController from '../controllers/Activity';
-import * as DataController from '../controllers/Data';
+// import * as DataController from '../controllers/Data';
 
 // import validator from '../utils/validator';
 // import * as ActivityValidator from '../validators/ActivityValidator';
@@ -96,7 +96,7 @@ class ActivityRoutes {
      */
     this.router.post(
       '/',
-      DataController.upload.single('file'),
+      // DataController.upload.single('file'),
       // ActivityController.createActivityFromFile,
     );
   }

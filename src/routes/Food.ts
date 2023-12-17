@@ -1,11 +1,10 @@
 import { Router } from 'express';
 
-// import Middleware from '../middleware/middleware';
+import Middleware from '../middleware/middleware';
 import FoodController from '../controllers/Food';
-import * as DataController from '../controllers/Data';
 
-// import validator from '../utils/validator';
-// import * as FoodValidator from '../validators/FoodValidator';
+import validator from '../utils/validator';
+import * as RouteValidator from '../validators/RouteValidator';
 
 class FoodRoutes {
   public router: Router;
@@ -23,7 +22,6 @@ class FoodRoutes {
      *    tags:
      *      - Food
      *    summary: Get food list
-     *    security: []
      *    responses:
      *      200:
      *        description: Success
@@ -39,6 +37,8 @@ class FoodRoutes {
      */
     this.router.get(
       '/list',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
       FoodController.getList,
     );
     
@@ -49,7 +49,6 @@ class FoodRoutes {
      *    tags:
      *      - Food
      *    summary: Get food by id
-     *    security: []
      *    parameters:
      *      - in: path
      *        name: foodId
@@ -71,6 +70,8 @@ class FoodRoutes {
      */
     this.router.get(
       '/:foodId',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
       FoodController.getById,
     );
 
@@ -96,8 +97,7 @@ class FoodRoutes {
      */
     this.router.post(
       '/',
-      DataController.upload.single('file'),
-      // FoodController.createFoodFromFile,
+      FoodController.generateFoodFromFile,
     );
   }
 }

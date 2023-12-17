@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { FoodEntity } from 'entities/Food';
 import prisma from '../utils/db.server';
+import csvParser from '../utils/csvParser';
 
 class FoodController {
   private _mapDocToFoodEntity = (doc: any): FoodEntity => ({
@@ -25,6 +26,8 @@ class FoodController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         foodList: foodList.map((food: any) =>
           this._mapDocToFoodEntity(food)
         ),
@@ -56,7 +59,48 @@ class FoodController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         food: this._mapDocToFoodEntity(food)
+      });
+
+      return next();
+    } catch (err: any) {
+      res.status(500);
+      // eslint-disable-next-line no-console
+      console.log(err.message);
+
+      return next(new Error(err.message));
+    }
+  };
+
+  generateFoodFromFile = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const foodHeader = ['foodId', 'calories', 'proteins', 'fat', 'carbohydrate', 'name', 'image'];
+      const rows = await csvParser('./src/data/nutrition.csv', foodHeader);
+
+      const idToCheck: number[] = rows.map(row => row.foodId);
+      await prisma.food.deleteMany({
+        where: {
+          foodId: {
+            in: idToCheck
+          }
+        },
+      });
+
+      await prisma.food.createMany({
+        data: rows,
+      });
+
+      res.status(200);
+      res.json({
+        success: true,
+        message: '',
+        rows,
       });
 
       return next();

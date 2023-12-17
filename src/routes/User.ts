@@ -33,7 +33,11 @@ class UserRoutes {
      *            $ref: '#/components/schemas/RegisterRequest'
      *    responses:
      *      200:
-     *        description: User sucessfully created.
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/RegisterResponse'
      */
     this.router.post(
       '/register',
@@ -212,7 +216,7 @@ class UserRoutes {
     this.router.put(
       '/image/',
       validator(RouteValidator.bearerToken),
-      DataController.upload.single('file'),
+      DataController.uploadUserImage.single('file'),
       Middleware.auth,
       validator(UserValidator.updateImageById),
       UserController.updateImageById
