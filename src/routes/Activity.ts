@@ -1,11 +1,10 @@
 import { Router } from 'express';
 
-// import Middleware from '../middleware/middleware';
+import Middleware from '../middleware/middleware';
 import ActivityController from '../controllers/Activity';
-// import * as DataController from '../controllers/Data';
 
-// import validator from '../utils/validator';
-// import * as ActivityValidator from '../validators/ActivityValidator';
+import validator from '../utils/validator';
+import * as RouteValidator from '../validators/RouteValidator';
 
 class ActivityRoutes {
   public router: Router;
@@ -23,22 +22,18 @@ class ActivityRoutes {
      *    tags:
      *      - Activity
      *    summary: Get activity list
-     *    security: []
      *    responses:
      *      200:
      *        description: Success
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                activityList:
-     *                  type: array
-     *                  items:
-     *                    $ref: '#/components/schemas/ActivityEntity'
+     *              $ref: '#/components/schemas/GetActivityListResponse'
      */
     this.router.get(
       '/list',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
       ActivityController.getList,
     );
     
@@ -49,7 +44,6 @@ class ActivityRoutes {
      *    tags:
      *      - Activity
      *    summary: Get activity by id
-     *    security: []
      *    parameters:
      *      - in: path
      *        name: activityId
@@ -64,23 +58,23 @@ class ActivityRoutes {
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                activity:
-     *                  $ref: '#/components/schemas/ActivityEntity'
+     *              $ref: '#/components/schemas/GetActivityByIdResponse'
      */
     this.router.get(
       '/:activityId',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
+      validator(RouteValidator.activityIdParam),
       ActivityController.getById,
     );
 
     /**
      * @openapi
-     * '/activities':
+     * '/activities/file':
      *  post:
      *    tags:
      *      - Activity
-     *    summary: Create activity from file
+     *    summary: Generate activity from file
      *    requestBody:
      *      content:
      *        multipart/form-data:
@@ -92,12 +86,17 @@ class ActivityRoutes {
      *                format: binary
      *    responses:
      *      200:
-     *        description: Activitys sucessfully created.
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/GenerateActivityFromFileResponse'
      */
     this.router.post(
-      '/',
-      // DataController.upload.single('file'),
-      // ActivityController.createActivityFromFile,
+      '/file',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
+      ActivityController.generateActivityFromFile,
     );
   }
 }

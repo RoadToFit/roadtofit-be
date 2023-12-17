@@ -15,8 +15,12 @@ class UserController {
     gender: doc.gender,
     bodyType: doc.bodyType,
     bmi: doc.bmi,
-    foodRecommendations: doc.foodRecommendations || [],
-    activityRecommendations: doc.activityRecommendations || [],
+    foodRecommendations: doc.foodRecommendations
+      ? doc.foodRecommendations.map((f: any) => ({...f.food}))
+      : [],
+    activityRecommendations: doc.activityRecommendations
+      ? doc.activityRecommendations.map((f: any) => ({...f.activity}))
+      : [],
     imageUrl: doc.imageUrl,
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),
@@ -45,7 +49,7 @@ class UserController {
    *          default: John Doe
    *        gender:
    *          type: string
-   *          default: MALE
+   *          enum: [MALE, FEMALE]
    *    RegisterResponse:
    *      type: object
    *      required:
@@ -102,7 +106,6 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
@@ -128,10 +131,10 @@ class UserController {
    *    LoginResponse:
    *      type: object
    *      required:
-   *        - user
-   *        - token
    *        - success
    *        - message
+   *        - user
+   *        - token
    *      properties:
    *        success:
    *          type: boolean
@@ -199,7 +202,6 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
@@ -213,21 +215,20 @@ class UserController {
    *    GetUserListResponse:
    *      type: object
    *      required:
-   *        - user
-   *        - token
    *        - success
    *        - message
+   *        - userList
    *      properties:
    *        success:
    *          type: boolean
    *          default: true
    *        message:
    *          type: string
-   *          default: Login success
-   *        user:
-   *          $ref: '#/components/schemas/UserEntity'
-   *        token:
-   *          type: string
+   *          default: OK
+   *        userList:
+   *          type: array
+   *          items:
+   *            $ref: '#/components/schemas/UserEntity'
    */
   getList = async (
     req: Request,
@@ -260,13 +261,32 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GetUserByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   */
   getById = async (
     req: Request,
     res: Response,
@@ -312,7 +332,6 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
@@ -332,6 +351,24 @@ class UserController {
    *        age:
    *          type: number
    *          default: 15
+   *        bodyType:
+   *          type: number
+   *          enum: [ECTOMORPH, MESOMORPH, ENDOMORPH]
+   *    UpdateUserByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
    */
   updateById = async (
     req: Request,
@@ -339,7 +376,7 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId, name, age } = req.body;
+      const { userId, name, age, bodyType } = req.body;
 
       const user = await prisma.user.update({
         where: {
@@ -348,6 +385,7 @@ class UserController {
         data: {
           name,
           age,
+          bodyType,
         },
         include: {
           foodRecommendations: {
@@ -366,14 +404,13 @@ class UserController {
       res.status(200);
       res.json({
         success: true,
-        message: '',
+        message: 'OK',
         user: this._mapDocToUserEntity(user),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
@@ -384,9 +421,15 @@ class UserController {
    * @openapi
    * components:
    *  schemas:
-   *    UpdateRecommendationByIdRequest:
+   *    UpdateUserRecommendationByIdRequest:
    *      type: object
+   *      required:
+   *        - bmi
+   *        - foodRecommendations
+   *        - activityRecommendations
    *      properties:
+   *        bmi:
+   *          type: number
    *        foodRecommendations:
    *          type: array
    *          items:
@@ -395,6 +438,21 @@ class UserController {
    *          type: array
    *          items:
    *            type: number
+   *    UpdateUserRecommendationByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
    */
   updateRecommendationById = async (
     req: Request,
@@ -403,6 +461,19 @@ class UserController {
   ): Promise<void> => {
     try {
       const { userId, bmi, foodRecommendations, activityRecommendations } = req.body;
+
+      // Delete all previous recommendations
+      await prisma.userFoodRecommendations.deleteMany({
+        where: {
+          userId,
+        }
+      })
+
+      await prisma.userActivityRecommendations.deleteMany({
+        where: {
+          userId,
+        }
+      })
 
       const user = await prisma.user.update({
         where: {
@@ -442,20 +513,47 @@ class UserController {
       res.status(200);
       res.json({
         success: true,
-        message: '',
+        message: 'OK',
         user: this._mapDocToUserEntity(user),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    UpdateUserImageByIdRequest:
+   *      type: object
+   *      required:
+   *        - file
+   *      properties:
+   *        file:
+   *          type: string
+   *          format: binary
+   *    UpdateUserImageByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   */
   updateImageById = async (
     req: Request,
     res: Response,
@@ -495,20 +593,36 @@ class UserController {
       res.status(200);
       res.json({
         success: true,
-        message: '',
+        message: 'OK',
         user: this._mapDocToUserEntity(user),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    DeleteUserByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: User sucessfully deleted
+   */
   deleteById = async (
     req: Request,
     res: Response,
@@ -546,12 +660,14 @@ class UserController {
       }
 
       res.status(200);
-      res.json({ message: 'User sucessfully deleted' });
+      res.json({
+        success: true,
+        message: 'User sucessfully deleted',
+      });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));

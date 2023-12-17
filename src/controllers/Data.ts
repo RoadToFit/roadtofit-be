@@ -16,15 +16,6 @@ const uploadUserImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 })
 
-const uploadFoodCSV = multer({
-  storage: new MulterGoogleCloudStorage({
-    acl: 'publicRead',
-    destination: 'foods/',
-    filename: 'food_dataset.csv',
-  }),
-})
-
 export {
   uploadUserImage,
-  uploadFoodCSV,
 };

@@ -16,6 +16,28 @@ class FoodController {
     updatedAt: new Date(doc.updatedAt),
   });
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GetFoodListResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - foodList
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        foodList:
+   *          type: array
+   *          items:
+   *            $ref: '#/components/schemas/FoodEntity'
+   */
   getList = async (
     req: Request,
     res: Response,
@@ -27,7 +49,7 @@ class FoodController {
       res.status(200);
       res.json({
         success: true,
-        message: '',
+        message: 'OK',
         foodList: foodList.map((food: any) =>
           this._mapDocToFoodEntity(food)
         ),
@@ -36,13 +58,32 @@ class FoodController {
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GetFoodByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - food
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        food:
+   *          $ref: '#/components/schemas/FoodEntity'
+   */
   getById = async (
     req: Request,
     res: Response,
@@ -56,24 +97,50 @@ class FoodController {
           foodId: parseInt(foodId, 10),
         },
       });
+      
+      if (!food) {
+        res.status(404);
+        res.json({
+          success: false,
+          message: 'Food not found',
+        });
+
+        return next();
+      }
 
       res.status(200);
       res.json({
         success: true,
-        message: '',
+        message: 'OK',
         food: this._mapDocToFoodEntity(food)
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GenerateFoodFromFileResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: Foods sucessfully generated
+   */
   generateFoodFromFile = async (
     req: Request,
     res: Response,
@@ -99,14 +166,12 @@ class FoodController {
       res.status(200);
       res.json({
         success: true,
-        message: '',
-        rows,
+        message: 'Foods sucessfully generated',
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));

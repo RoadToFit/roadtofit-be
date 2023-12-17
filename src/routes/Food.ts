@@ -28,12 +28,7 @@ class FoodRoutes {
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                foodList:
-     *                  type: array
-     *                  items:
-     *                    $ref: '#/components/schemas/FoodEntity'
+     *              $ref: '#/components/schemas/GetFoodListResponse'
      */
     this.router.get(
       '/list',
@@ -63,25 +58,23 @@ class FoodRoutes {
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                food:
-     *                  $ref: '#/components/schemas/FoodEntity'
+     *              $ref: '#/components/schemas/GetFoodByIdResponse'
      */
     this.router.get(
       '/:foodId',
       validator(RouteValidator.bearerToken),
       Middleware.auth,
+      validator(RouteValidator.foodIdParam),
       FoodController.getById,
     );
 
     /**
      * @openapi
-     * '/foods':
+     * '/foods/file':
      *  post:
      *    tags:
      *      - Food
-     *    summary: Create food from file
+     *    summary: Generate food from file
      *    requestBody:
      *      content:
      *        multipart/form-data:
@@ -93,10 +86,16 @@ class FoodRoutes {
      *                format: binary
      *    responses:
      *      200:
-     *        description: Foods sucessfully created.
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/GenerateFoodFromFileResponse'
      */
     this.router.post(
-      '/',
+      '/file',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
       FoodController.generateFoodFromFile,
     );
   }

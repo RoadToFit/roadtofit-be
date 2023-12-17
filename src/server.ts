@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -23,7 +23,8 @@ class App {
   protected plugins(): void {
     this.app.use(bodyParser.json());
     this.app.use(cors());
-    this.app.use(morgan('dev'));
+    morgan.token('reqbody', (req: Request) => JSON.stringify(req.body));
+    this.app.use(morgan(':method :url :status --body :reqbody'));
     swaggerDocs(this.app);
   }
 
@@ -38,5 +39,4 @@ const PORT = process.env.PORT || 4000;
 const { app } = new App();
 app.listen(PORT);
 
-// eslint-disable-next-line no-console
 console.log(`Listening on port: ${PORT}`);

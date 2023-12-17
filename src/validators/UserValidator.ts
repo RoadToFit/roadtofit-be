@@ -40,6 +40,9 @@ const updateById = Joi.object().keys({
     age: Joi.number()
       .optional()
       .error(new Error('Invalid age format')),
+    bodyType: Joi.string()
+      .optional()
+      .error(new Error('Invalid bodyType format')),
   })
 }).unknown();
 
@@ -51,9 +54,27 @@ const updateImageById = Joi.object().keys({
   }).unknown(),
 }).unknown();
 
+const updateRecommendationById = Joi.object().keys({
+  body: Joi.object().keys({
+    userId: Joi.number()
+      .required()
+      .error(new Error('Invalid userId format')),
+  }).unknown(),
+}).unknown();
+
+const deleteById = Joi.object().keys({
+  params: Joi.object().keys({
+    userId: Joi.number()
+      .required()
+      .error(new Error('Invalid userId format')),
+  }).unknown(),
+}).unknown();
+
 export {
   register,
   login,
   updateById,
   updateImageById,
+  updateRecommendationById,
+  deleteById,
 }
