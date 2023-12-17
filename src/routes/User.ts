@@ -33,7 +33,11 @@ class UserRoutes {
      *            $ref: '#/components/schemas/RegisterRequest'
      *    responses:
      *      200:
-     *        description: User sucessfully created.
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/RegisterResponse'
      */
     this.router.post(
       '/register',
@@ -82,12 +86,7 @@ class UserRoutes {
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                userList:
-     *                  type: array
-     *                  items:
-     *                    $ref: '#/components/schemas/UserEntity'
+     *              $ref: '#/components/schemas/GetUserListResponse'
      */
     this.router.get(
       '/list',
@@ -102,17 +101,14 @@ class UserRoutes {
      *  get:
      *    tags:
      *      - User
-     *    summary: Get a user by id
+     *    summary: Get user by ID
      *    responses:
      *      200:
      *        description: Success
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                user:
-     *                  $ref: '#/components/schemas/UserEntity'
+     *              $ref: '#/components/schemas/GetUserByIdResponse'
      */
     this.router.get(
       '/',
@@ -132,17 +128,14 @@ class UserRoutes {
      *      content:
      *        application/json:
      *          schema:
-     *            $ref: '#/components/schemas/UpdateByIdRequest'
+     *            $ref: '#/components/schemas/UpdateUserByIdRequest'
      *    responses:
      *      200:
      *        description: Success
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                user:
-     *                  $ref: '#/components/schemas/UserEntity'
+     *              $ref: '#/components/schemas/UpdateUserByIdResponse'
      */
     this.router.put(
       '/',
@@ -150,6 +143,33 @@ class UserRoutes {
       Middleware.auth,
       validator(UserValidator.updateById),
       UserController.updateById,
+    );
+    
+    /**
+     * @openapi
+     * '/users/recommendation':
+     *  put:
+     *    tags:
+     *      - User
+     *    summary: Update a user bmi and recommendation by id
+     *    requestBody:
+     *      content:
+     *        application/json:
+     *          schema:
+     *            $ref: '#/components/schemas/UpdateUserRecommendationByIdRequest'
+     *    responses:
+     *      200:
+     *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/UpdateUserRecommendationByIdResponse'
+     */
+    this.router.put(
+      '/recommendation',
+      validator(RouteValidator.bearerToken),
+      Middleware.auth,
+      UserController.updateRecommendationById,
     );
 
     /**
@@ -159,38 +179,56 @@ class UserRoutes {
      *    tags:
      *      - User
      *    summary: Update a user image by id
+     *    requestBody:
+     *      content:
+     *        multipart/form-data:
+     *          schema:
+     *            $ref: '#/components/schemas/UpdateUserImageByIdRequest'
      *    responses:
      *      200:
      *        description: Success
      *        content:
      *          application/json:
      *            schema:
-     *              type: object
-     *              properties:
-     *                user:
-     *                  $ref: '#/components/schemas/UserEntity'
+     *              $ref: '#/components/schemas/UpdateUserImageByIdResponse'
      */
     this.router.put(
       '/image/',
+      validator(RouteValidator.bearerToken),
+      DataController.uploadUserImage.single('file'),
       Middleware.auth,
-      DataController.uploadData.single('file'),
+      validator(UserValidator.updateImageById),
       UserController.updateImageById
     );
 
     /**
      * @openapi
-     * '/users/image':
+     * '/users/{userId}':
      *  delete:
      *    tags:
      *      - User
      *    summary: Delete a user by id
+     *    parameters:
+     *      - in: path
+     *        name: userId
+     *        required: true
+     *        schema:
+     *          type: integer
+     *          minimum: 1
+     *        description: The user ID
      *    responses:
      *      200:
      *        description: Success
+     *        content:
+     *          application/json:
+     *            schema:
+     *              $ref: '#/components/schemas/DeleteUserByIdResponse'
      */
     this.router.delete(
       '/',
+      validator(RouteValidator.bearerToken),
       Middleware.auth,
+      validator(UserValidator.deleteById),
       UserController.deleteById,
     );
   }

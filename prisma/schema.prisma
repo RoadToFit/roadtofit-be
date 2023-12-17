@@ -16,11 +16,6 @@ enum Gender {
   FEMALE
 }
 
-enum HistoryType {
-  BMI
-  BODYTYPE
-}
-
 model User {
   userId                  Int                     @id @default(autoincrement())
   username                String                  @unique
@@ -28,21 +23,52 @@ model User {
   name                    String
   gender                  Gender
   age                     Int?
-  weight                  Float?
-  height                  Float?
+  bodyType                String?
+  bmi                     Float?
   imageUrl                String?
-  histories               History[]
+  foodRecommendations     UserFoodRecommendations[]
+  activityRecommendations UserActivityRecommendations[]
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt    
 }
 
-model History {
-  historyId               Int                     @id @default(autoincrement())
-  user                    User                    @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  userId                  Int
-  historyType             HistoryType
-  result                  String
-  description             String
+model Food {
+  foodId                  Int                     @id
+  name                    String                  @unique
+  calories                Float
+  proteins                Float
+  fat                     Float
+  carbohydrate            Float
+  image                   String
+  foodRecommendations     UserFoodRecommendations[]
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt    
+}
+
+model Activity {
+  activityId              Int                     @id @default(autoincrement())
+  activity                String                  @unique
+  category                String
+  calPerHour              Float
+  activityRecommendations UserActivityRecommendations[]
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt    
+}
+
+model UserFoodRecommendations {
+  user                    User                    @relation(fields: [userId], references: [userId])
+  userId                  Int
+  food                    Food                    @relation(fields: [foodId], references: [foodId], onDelete: Cascade)
+  foodId                  Int
+
+  @@id([userId, foodId])
+}
+
+model UserActivityRecommendations {
+  user                    User                    @relation(fields: [userId], references: [userId])
+  userId                  Int
+  activity                Activity                @relation(fields: [activityId], references: [activityId], onDelete: Cascade)
+  activityId              Int
+
+  @@id([userId, activityId])
 }

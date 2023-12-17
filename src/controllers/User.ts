@@ -13,8 +13,14 @@ class UserController {
     name: doc.name,
     age: doc.age,
     gender: doc.gender,
-    weight: doc.weight,
-    height: doc.height,
+    bodyType: doc.bodyType,
+    bmi: doc.bmi,
+    foodRecommendations: doc.foodRecommendations
+      ? doc.foodRecommendations.map((f: any) => ({...f.food}))
+      : [],
+    activityRecommendations: doc.activityRecommendations
+      ? doc.activityRecommendations.map((f: any) => ({...f.activity}))
+      : [],
     imageUrl: doc.imageUrl,
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),
@@ -43,7 +49,19 @@ class UserController {
    *          default: John Doe
    *        gender:
    *          type: string
-   *          default: MALE
+   *          enum: [MALE, FEMALE]
+   *    RegisterResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: User sucessfully created
    */
   register = async (
     req: Request,
@@ -61,7 +79,10 @@ class UserController {
 
       if (data) {
         res.status(404);
-        res.json({ message: 'Username already exist' });
+        res.json({ 
+          success: false,
+          message: 'Username already exist'
+        });
         throw new Error('Username already exist');
       }
 
@@ -77,12 +98,14 @@ class UserController {
       });
 
       res.status(200);
-      res.json({ message: 'User sucessfully created' });
+      res.json({
+        success: true,
+        message: 'User sucessfully created',
+      });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
@@ -108,9 +131,17 @@ class UserController {
    *    LoginResponse:
    *      type: object
    *      required:
+   *        - success
+   *        - message
    *        - user
    *        - token
    *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: Login success
    *        user:
    *          $ref: '#/components/schemas/UserEntity'
    *        token:
@@ -132,7 +163,10 @@ class UserController {
 
       if (!user) {
         res.status(404);
-        res.json({ message: 'Wrong credentials' });
+        res.json({
+          status: false,
+          message: 'Wrong credentials',
+        });
         throw new Error('Wrong credentials');
       }
 
@@ -140,7 +174,10 @@ class UserController {
 
       if (!valid) {
         res.status(401);
-        res.json({ message: 'Wrong credentials' });
+        res.json({
+          status: false,
+          message: 'Wrong credentials',
+        });
         throw new Error('Wrong credentials');
       }
 
@@ -156,6 +193,8 @@ class UserController {
 
       res.status(200);
       res.json({
+        success: true,
+        message: 'Login success',
         user: this._mapDocToUserEntity(user),
         token,
       });
@@ -163,36 +202,91 @@ class UserController {
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GetUserListResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - userList
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        userList:
+   *          type: array
+   *          items:
+   *            $ref: '#/components/schemas/UserEntity'
+   */
   getList = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const userList = await prisma.user.findMany();
+      const userList = await prisma.user.findMany({
+        include: {
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
+      });
 
       res.status(200);
       res.json({
+        success: true,
+        message: 'OK',
         userList: userList.map((user: any) => this._mapDocToUserEntity(user)),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    GetUserByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   */
   getById = async (
     req: Request,
     res: Response,
@@ -204,24 +298,40 @@ class UserController {
         where: {
           userId,
         },
+        include: {
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       if (!user) {
-        res.status(204);
-        res.send();
+        res.status(404);
+        res.json({
+          success: false,
+          message: 'User not found',
+        });
 
         return next();
       }
 
       res.status(200);
       res.json({
+        success: true,
+        message: '',
         user: this._mapDocToUserEntity(user),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
@@ -232,7 +342,7 @@ class UserController {
    * @openapi
    * components:
    *  schemas:
-   *    UpdateByIdRequest:
+   *    UpdateUserByIdRequest:
    *      type: object
    *      properties:
    *        name:
@@ -241,12 +351,24 @@ class UserController {
    *        age:
    *          type: number
    *          default: 15
-   *        weight:
+   *        bodyType:
    *          type: number
-   *          default: 150
-   *        height:
-   *          type: number
-   *          default: 50
+   *          enum: [ECTOMORPH, MESOMORPH, ENDOMORPH]
+   *    UpdateUserByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
    */
   updateById = async (
     req: Request,
@@ -254,7 +376,7 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const { userId, name, age, weight, height } = req.body;
+      const { userId, name, age, bodyType } = req.body;
 
       const user = await prisma.user.update({
         where: {
@@ -263,94 +385,244 @@ class UserController {
         data: {
           name,
           age,
-          weight,
-          height,
+          bodyType,
         },
+        include: {
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       res.status(200);
       res.json({
+        success: true,
+        message: 'OK',
         user: this._mapDocToUserEntity(user),
       });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
-  // TODO:
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    UpdateUserRecommendationByIdRequest:
+   *      type: object
+   *      required:
+   *        - bmi
+   *        - foodRecommendations
+   *        - activityRecommendations
+   *      properties:
+   *        bmi:
+   *          type: number
+   *        foodRecommendations:
+   *          type: array
+   *          items:
+   *            type: number
+   *        activityRecommendations:
+   *          type: array
+   *          items:
+   *            type: number
+   *    UpdateUserRecommendationByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   */
+  updateRecommendationById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const { userId, bmi, foodRecommendations, activityRecommendations } = req.body;
+
+      // Delete all previous recommendations
+      await prisma.userFoodRecommendations.deleteMany({
+        where: {
+          userId,
+        }
+      })
+
+      await prisma.userActivityRecommendations.deleteMany({
+        where: {
+          userId,
+        }
+      })
+
+      const user = await prisma.user.update({
+        where: {
+          userId,
+        },
+        data: {
+          bmi,
+          foodRecommendations: {
+            create: foodRecommendations.map((id: number) => ({
+              food: { 
+                connect: { foodId: id }
+              }
+            }))
+          },
+          activityRecommendations: {
+            create: activityRecommendations.map((id: number) => ({
+              activity: { 
+                connect: { activityId: id }
+              }
+            }))
+          }
+        },
+        include: {
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },    
+      });
+
+      res.status(200);
+      res.json({
+        success: true,
+        message: 'OK',
+        user: this._mapDocToUserEntity(user),
+      });
+
+      return next();
+    } catch (err: any) {
+      res.status(500);
+      console.log(err.message);
+
+      return next(new Error(err.message));
+    }
+  };
+
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    UpdateUserImageByIdRequest:
+   *      type: object
+   *      required:
+   *        - file
+   *      properties:
+   *        file:
+   *          type: string
+   *          format: binary
+   *    UpdateUserImageByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *        - user
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: OK
+   *        user:
+   *          $ref: '#/components/schemas/UserEntity'
+   */
   updateImageById = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      /*
       const { userId } = req.body;
 
       if (!req.file) {
         res.status(400)
-        res.send({ message: "Please upload a file!" });
+        res.send({ message: "No image uploaded" });
 
         return next();
       }
 
-      const blob = StorageController.bucket.file(req.file.originalname);
-      const blobStream = blob.createWriteStream();
-
-      blobStream.on('error', (err: any) => {
-        res.status(500)
-        res.send({ message: err.message });
-
-        return next();
-      })
-
-      // eslint-disable-next-line consistent-return
-      blobStream.on('finish', async () => {
-        const publicUrl = `https://storage.googleapis.com/${StorageController.bucket.name}/${blob.name}`;
-
-        try {
-          await StorageController.bucket.file(req.file!.originalname).makePublic();
-        } catch {
-          res.status(500)
-          res.send({ message: `Public access denied of ${publicUrl}` });
-
-          return next();
-        }
-
-        const user = await prisma.user.update({
-          where: {
-            userId,
+      const user = await prisma.user.update({
+        where: {
+          userId,
+        },
+        data: {
+          imageUrl: `https://storage.googleapis.com/roadtofit-bucket/${req.file.path}`,
+        },
+        include: {
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
           },
-          data: {
-            imageUrl: publicUrl,
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
           },
-        });
+        },   
+      });
 
-        res.status(200);
-        res.json({
-          user: this._mapDocToUserEntity(user),
-        });
-      })
-
-      blobStream.end(req.file.buffer);
-      */
+      res.status(200);
+      res.json({
+        success: true,
+        message: 'OK',
+        user: this._mapDocToUserEntity(user),
+      });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));
     }
   };
 
+  /**
+   * @openapi
+   * components:
+   *  schemas:
+   *    DeleteUserByIdResponse:
+   *      type: object
+   *      required:
+   *        - success
+   *        - message
+   *      properties:
+   *        success:
+   *          type: boolean
+   *          default: true
+   *        message:
+   *          type: string
+   *          default: User sucessfully deleted
+   */
   deleteById = async (
     req: Request,
     res: Response,
@@ -363,22 +635,39 @@ class UserController {
         where: {
           userId,
         },
+        include: {
+          foodRecommendations: {
+            include: {
+              food: true,
+            },
+          },
+          activityRecommendations: {
+            include: {
+              activity: true,
+            },
+          },
+        },   
       });
 
       if (!user) {
-        res.status(204);
-        res.send();
+        res.status(404);
+        res.json({
+          success: false,
+          message: 'User not found',
+        });
 
         return next();
       }
 
       res.status(200);
-      res.json({ message: 'User sucessfully deleted' });
+      res.json({
+        success: true,
+        message: 'User sucessfully deleted',
+      });
 
       return next();
     } catch (err: any) {
       res.status(500);
-      // eslint-disable-next-line no-console
       console.log(err.message);
 
       return next(new Error(err.message));

@@ -1,3 +1,6 @@
+import { ActivityEntity } from "./Activity";
+import { FoodEntity } from "./Food";
+
 /**
  * @openapi
  * components:
@@ -9,6 +12,8 @@
  *        - username
  *        - name
  *        - gender
+ *        - foodRecommendations
+ *        - activityRecommendations
  *        - createdAt
  *        - updatedAt
  *      properties:
@@ -23,12 +28,14 @@
  *        age:
  *          type: number
  *          nullable: true
- *        weight:
- *          type: number
- *          nullable: true
- *        height:
- *          type: number
- *          nullable: true
+ *        foodRecommendations:
+ *          type: array
+ *          items:
+ *            $ref: '#/components/schemas/FoodEntity'
+ *        activityRecommendations:
+ *          type: array
+ *          items:
+ *            $ref: '#/components/schemas/ActivityEntity'
  *        imageUrl:
  *          type: string
  *          nullable: true
@@ -43,9 +50,11 @@ export type UserEntity = {
   name: string;
   gender: string;
   age: number | null;
-  weight: number | null;
-  height: number | null;
+  bodyType: string | null;
+  bmi: number | null;
   imageUrl: string | null;
+  foodRecommendations: FoodEntity[];
+  activityRecommendations: ActivityEntity[];
   createdAt: Date;
   updatedAt: Date;
 };

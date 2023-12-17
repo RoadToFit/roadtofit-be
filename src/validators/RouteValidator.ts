@@ -9,15 +9,24 @@ const bearerToken = Joi.object().keys({
   }).unknown(),
 }).unknown();
 
-const historyIdParam = Joi.object().keys({
+const foodIdParam = Joi.object().keys({
   params: Joi.object().keys({
-    historyId: Joi.string()
+    foodId: Joi.string()
       .required()
-      .error(new Error('Invalid historyId format')),
+      .error(new Error('Invalid foodId format')),
+  }).unknown(),
+}).unknown();
+
+const activityIdParam = Joi.object().keys({
+  params: Joi.object().keys({
+    activityId: Joi.string()
+      .required()
+      .error(new Error('Invalid activityId format')),
   }).unknown(),
 }).unknown();
 
 export {
   bearerToken,
-  historyIdParam
+  foodIdParam,
+  activityIdParam,
 }
