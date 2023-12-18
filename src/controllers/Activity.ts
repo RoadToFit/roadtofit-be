@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ActivityEntity } from 'entities/Activity';
 import prisma from '../utils/db.server';
-// import csvParser from 'utils/csvParser';
+import csvParser from '../utils/csvParser';
 
 class ActivityController {
   private _mapDocToActivityEntity = (doc: any): ActivityEntity => ({
@@ -134,31 +134,30 @@ class ActivityController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      // TODO:
-      throw new Error('Method not implemented')
-      // const activityHeader = ['activityId', 'activity', 'category', 'calPerHour'];
-      // const rows = await csvParser('./src/data/activity.csv', activityHeader);
+      const activityHeader = ['activity', 'category', 'calPerHour', 'activityId'];
+      const rows = await csvParser('./src/data/workout.csv', activityHeader);
 
-      // const idToCheck: number[] = rows.map(row => row.activityId);
-      // await prisma.activity.deleteMany({
-      //   where: {
-      //     activityId: {
-      //       in: idToCheck
-      //     }
-      //   },
-      // });
+      console.log(rows);
+      const idToCheck: number[] = rows.map(row => row.activityId);
+      await prisma.activity.deleteMany({
+        where: {
+          activityId: {
+            in: idToCheck
+          }
+        },
+      });
 
-      // await prisma.activity.createMany({
-      //   data: rows,
-      // });
+      await prisma.activity.createMany({
+        data: rows,
+      });
 
-      // res.status(200);
-      // res.json({
-      //   success: true,
-      //   message: 'Activities sucessfully generated',
-      // });
+      res.status(200);
+      res.json({
+        success: true,
+        message: 'Activities sucessfully generated',
+      });
 
-      // return next();
+      return next();
     } catch (err: any) {
       res.status(500);
       console.log(err.message);
