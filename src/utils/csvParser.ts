@@ -10,13 +10,14 @@ const csvParser = async (filename: string, headers: string[]) => new Promise<any
         row.forEach((value: any, index: any) => {
           const header = headers[index];
 
-          if (header === 'foodId') {
+          if (header === 'foodId' || header === 'activityId') {
             parsedRow[header] = parseInt(value, 10);
           } else if (
             header === 'calories'
             || header === 'proteins'
             || header === 'fat'
             || header === 'carbohydrate'
+            || header === 'calPerHour'
           ) {
             parsedRow[header] = parseInt(value, 10);
           } else {

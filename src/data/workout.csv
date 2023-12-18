@@ -1,0 +1,164 @@
+Aktivitas,kategori,kal/jam,id
+tidur,ringan,66,1
+istirahat,ringan,74,2
+duduk,ringan,103,3
+kerjaan kantoran (dibalik meja),ringan,110,4
+mengemudi,ringan,118,5
+yoga,ringan,220,6
+spa,ringan,147,7
+seks,ringan,147,8
+pijat,ringan,147,9
+pengajaran,ringan,147,10
+menyusui,ringan,147,11
+menyanyi,ringan,147,12
+menonton televisi,ringan,147,13
+memasak,ringan,147,14
+membaca,ringan,147,15
+karaoke,ringan,147,16
+jahit,ringan,147,17
+belajar,ringan,147,18
+golf (keranjang),ringan,147,19
+bermain musik,ringan,147,20
+berjalan lambat - 3 km/jam,ringan,147,21
+berdiri,ringan,147,22
+menyetrika,ringan,220,23
+mencuci piring,ringan,220,24
+peregangan (yoga),ringan,220,25
+mencuci pakaian,ringan,220,26
+mencuci mobil,moderat,220,27
+memancing,moderat,220,28
+berlayar,moderat,220,29
+berselancar,moderat,220,30
+boat atau kano,moderat,220,31
+pilates,moderat,228,32
+berjalan (sedang) - 5 km/jam,moderat,243,33
+"senam (ringan, di rumah)",moderat,257,34
+"berjalan (latihan) - 5,5 km/jam",moderat,279,35
+bersepeda (santai) - <16 km/jam,moderat,294,36
+berkuda,moderat,294,37
+menyapu daun,moderat,294,38
+motor-cross,moderat,294,39
+golf (berjalan),moderat,294,40
+bersepeda di dalam air,moderat,294,41
+bowling,moderat,294,42
+bola voli,moderat,294,43
+tari (gerak lambat),moderat,294,44
+pekerjaan kebun (berkebun),moderat,294,45
+tenis meja,moderat,294,46
+bikram yoga,moderat,294,47
+panahan,moderat,294,48
+berenang,moderat,294,49
+mengecat,moderat,368,50
+menyekop,moderat,368,51
+berburu,moderat,368,52
+"berjalan (cepat) - 6,5 km/jam",moderat,368,53
+skating - 16 km/jam,moderat,368,54
+kriket,moderat,368,55
+kayaking,moderat,368,56
+hula hoop,moderat,368,57
+bulutangkis,moderat,368,58
+tari (tari keseimbangan),moderat,368,59
+baseball,moderat,368,60
+memotong rumput,moderat,368,61
+softball,moderat,368,62
+ski (air),moderat,441,63
+"tari (gerak cepat, aerobik)",moderat,441,64
+selam scuba,moderat,441,65
+power walking,moderat,441,66
+memanjat pohon,moderat,441,67
+pelatihan sirkuit,moderat,441,68
+olahraga menggunakan mesin (lambat),moderat,441,69
+menyekop salju,moderat,441,70
+trampoline,moderat,441,71
+latihan beban (sedang),moderat,441,72
+hiking,moderat,441,73
+gym,moderat,441,74
+bola lantai (floorball),moderat,441,75
+bola jaring (netball),moderat,441,76
+bersepeda (lambat) - 18 km/jam,moderat,441,77
+pole dance,moderat,441,78
+basket,moderat,441,79
+aerobik,berat,514,80
+GRIT,berat,514,81
+HIIT,berat,514,82
+insanity,berat,514,83
+jiu-jitsu,berat,514,84
+judo,berat,514,85
+kangoo,berat,514,86
+karate,berat,514,87
+kickboxing,berat,514,88
+XCO,berat,514,89
+Muay Thai,berat,514,90
+Naik Tangga,berat,514,91
+P90X,berat,514,92
+power jump,berat,514,93
+RPM,berat,514,94
+seni bela diri,berat,514,95
+snowboard,berat,514,96
+T25,berat,514,97
+tae bo,berat,514,98
+taekwondo,berat,514,99
+TRX,berat,514,100
+VTT,berat,514,101
+fitness (workout),berat,514,102
+CX,berat,514,103
+zumba,berat,514,104
+crossfit,berat,514,105
+curves,berat,514,106
+ballet,berat,514,107
+body attack,berat,514,108
+body balance,berat,514,109
+body pump,berat,514,110
+bersepeda,berat,514,111
+body combat,berat,514,112
+berenang (sedang),berat,514,113
+cardio,berat,514,114
+cross training,berat,514,115
+aerobik air,berat,514,116
+sepeda mesin (stationary bike),berat,588,117
+rugby,berat,588,118
+senam (berat - misalnya push up),berat,588,119
+perlombaan,berat,588,120
+sepak bola,berat,588,121
+rowing,berat,588,122
+ski (turun bukit),berat,588,123
+stepper,berat,588,124
+squash atau bola tangan,berat,588,125
+squats,berat,588,126
+arc trainer,berat,588,127
+angkat besi,berat,588,128
+alat olahraga,berat,588,129
+tenis,berat,588,130
+treadmill,berat,588,131
+air climber,berat,588,132
+vibration plate,berat,588,133
+spinning,berat,588,134
+pendakian,berat,588,135
+olahraga dengan mesin (sedang),berat,588,136
+berjalan (jogging) - 8 km/jam,berat,588,137
+nordic walking,berat,588,138
+elliptical,berat,588,139
+bola tangan (handball),berat,588,140
+mountain biking,berat,588,141
+hoki,berat,588,142
+latihan perut,berat,588,143
+hoki es,berat,588,144
+jumping jacks,berat,588,145
+bersepeda (sedang) - 21 km/jam,berat,588,146
+lacrosse (permainan bola dengan tongkat),berat,588,147
+kettlebell,berat,588,148
+padel,berat,588,149
+lari - 10 km/jam,berat,735,150
+badminton,berat,735,151
+lompat tali (skipping),berat,735,152
+berenang (cepat),berat,735,153
+bermain roller blade,berat,735,154
+olahraga dengan mesin (cepat),berat,735,155
+bersepeda (cepat) - 24 km/jam,berat,735,156
+lari - 11 km/jam,berat,845,157
+bersepeda (sangat cepat) - 28 km/jam,berat,882,158
+ski (cross country),berat,882,159
+tinju,berat,882,160
+lari - 13 km/jam,berat,992,161
+"lari - 14,5 km/jam",berat,1102,162
+lari - 16 km/jam,berat,1176,163
