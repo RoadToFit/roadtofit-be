@@ -34,4 +34,17 @@ jobs:
 
       - name: Deploy image to Google Cloud Run
         run: |
-          gcloud run deploy roadtofit-be --image ${{ secrets.GCP_REPO_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/roadtofit-repo/roadtofit-be:latest --platform managed --region ${{ secrets.GCP_CLOUD_RUN_REGION }} --allow-unauthenticated --set-env-vars DATABASE_URL=${{ secrets.DATABASE_URL }} --port 4000 --min-instances 1 --max-instances 4
+          gcloud run deploy roadtofit-be \
+            --image ${{ secrets.GCP_REPO_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/roadtofit-repo/roadtofit-be:latest \
+            --platform managed \
+            --region ${{ secrets.GCP_CLOUD_RUN_REGION }} \
+            --allow-unauthenticated \
+            --service-account ${{ secrets.GCP_CLOUD_RUN_SA }} \
+            --update-secrets=/etc/secrets/key.json=${{ secrets.GCS_SECRET_KEY_NAME }}:latest \
+            --set-env-vars DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            --set-env-vars GCS_BUCKET=${{ secrets.GCS_BUCKET }} \
+            --set-env-vars GCLOUD_PROJECT=${{ secrets.GCLOUD_PROJECT }} \
+            --set-env-vars GCS_KEYFILE=/etc/secrets/key.json \
+            --port 4000 \
+            --min-instances 1 \
+            --max-instances 4
