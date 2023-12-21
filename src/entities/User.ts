@@ -28,6 +28,12 @@ import { FoodEntity } from "./Food";
  *        age:
  *          type: number
  *          nullable: true
+ *        bodyType:
+ *          type: string
+ *          nullable: true
+ *        bmi:
+ *          type: string
+ *          nullable: true
  *        foodRecommendations:
  *          type: array
  *          items:

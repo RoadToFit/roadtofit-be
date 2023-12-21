@@ -3,6 +3,7 @@ import { hash, compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 
 import { UserEntity } from '../entities/User';
+import { FoodEntity } from '../entities/Food';
 // import * as StorageController from "./Storage";
 import prisma from '../utils/db.server';
 
@@ -16,7 +17,7 @@ class UserController {
     bodyType: doc.bodyType,
     bmi: doc.bmi,
     foodRecommendations: doc.foodRecommendations
-      ? doc.foodRecommendations.map((f: any) => ({...f.food}))
+      ? this._sortFoodRecommendations(doc.foodRecommendations.map((f: any) => ({...f.food})))
       : [],
     activityRecommendations: doc.activityRecommendations
       ? doc.activityRecommendations.map((f: any) => ({...f.activity}))
@@ -25,6 +26,11 @@ class UserController {
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),
   });
+
+  private _sortFoodRecommendations = (foods: FoodEntity[]): FoodEntity[] => {
+    const categoryOrder = ['breakfast', 'lunch', 'dinner', 'snack'];
+    return foods.sort((a, b) => categoryOrder.indexOf(a.category) - categoryOrder.indexOf(b.category))
+  };
 
   /**
    * @openapi

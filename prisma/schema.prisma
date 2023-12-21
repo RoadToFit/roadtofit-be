@@ -34,12 +34,13 @@ model User {
 
 model Food {
   foodId                  Int                     @id
-  name                    String                  @unique
+  menu                    String
   calories                Float
-  proteins                Float
+  protein                 Float
   fat                     Float
-  carbohydrate            Float
+  carbo                   Float
   image                   String
+  category                String
   foodRecommendations     UserFoodRecommendations[]
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt    

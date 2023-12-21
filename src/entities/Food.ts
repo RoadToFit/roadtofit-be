@@ -6,28 +6,31 @@
  *      type: object
  *      required:
  *        - foodId
- *        - name
+ *        - menu
  *        - calories
- *        - proteins
+ *        - protein
  *        - fat
- *        - carbohydrate
+ *        - carbo
  *        - image
+ *        - category
  *        - createdAt
  *        - updatedAt
  *      properties:
  *        foodId:
  *          type: string
- *        name:
+ *        menu:
  *          type: string
  *        calories:
  *          type: number
- *        proteins:
+ *        protein:
  *          type: number
  *        fat:
  *          type: number
- *        carbohydrate:
+ *        carbo:
  *          type: number
  *        image:
+ *          type: string
+ *        category:
  *          type: string
  *        createdAt:
  *          type: string
@@ -36,12 +39,13 @@
  */
 export type FoodEntity = {
   foodId: string;
-  name: string;
+  menu: string;
   calories: number;
-  proteins: number;
+  protein: number;
   fat: number;
-  carbohydrate: number;
-  image: string;
+  carbo: number;
+  image?: string;
+  category: string;
   createdAt: Date;
   updatedAt: Date;
 };

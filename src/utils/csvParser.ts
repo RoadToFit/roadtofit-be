@@ -14,9 +14,9 @@ const csvParser = async (filename: string, headers: string[]) => new Promise<any
             parsedRow[header] = parseInt(value, 10);
           } else if (
             header === 'calories'
-            || header === 'proteins'
+            || header === 'protein'
             || header === 'fat'
-            || header === 'carbohydrate'
+            || header === 'carbo'
             || header === 'calPerHour'
           ) {
             parsedRow[header] = parseInt(value, 10);

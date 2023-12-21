@@ -62,6 +62,13 @@ class FoodRoutes {
      */
     this.router.get(
       '/:foodId',
+      (req, res, next) => {
+        if (req.params.foodId.toLowerCase() === 'list') {
+          // Skip execution if the parameter is 'list'
+          return next('route');
+        }
+        return next();
+      },
       validator(RouteValidator.bearerToken),
       Middleware.auth,
       validator(RouteValidator.foodIdParam),

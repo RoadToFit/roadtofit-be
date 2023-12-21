@@ -6,12 +6,13 @@ import csvParser from '../utils/csvParser';
 class FoodController {
   private _mapDocToFoodEntity = (doc: any): FoodEntity => ({
     foodId: doc.foodId,
-    name: doc.name,
+    menu: doc.menu,
     calories: doc.calories,
-    proteins: doc.proteins,
+    protein: doc.protein,
     fat: doc.fat,
-    carbohydrate: doc.carbohydrate,
+    carbo: doc.carbo,
     image: doc.image,
+    category: doc.category,
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),
   });
@@ -147,9 +148,8 @@ class FoodController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const foodHeader = ['foodId', 'calories', 'proteins', 'fat', 'carbohydrate', 'name', 'image'];
-      const rows = await csvParser('./src/data/nutrition.csv', foodHeader);
-
+      const foodHeader = ['foodId', 'menu', 'calories', 'protein', 'fat', 'carbo', 'image', 'category'];
+      const rows = await csvParser('./src/data/food.csv', foodHeader);
       const idToCheck: number[] = rows.map(row => row.foodId);
       await prisma.food.deleteMany({
         where: {
